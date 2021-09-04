@@ -23,7 +23,7 @@ pip install -r requirements.txt
 
 ### Setup
 
-Add DJANGO_SECRET to environmental variables
+Add your DJANGO_SECRET to environmental variables
 
 #### Apply migrations 
 
@@ -31,9 +31,13 @@ Add DJANGO_SECRET to environmental variables
 python manage.py migrate
 ```
 
-#### Set up the database
+#### Create a superuser
 
-TODO
+```
+python manage.py createsuperuser
+```
+
+*Note: remember these details to sign into the admin portal*
 
 ### Running
 
@@ -57,4 +61,13 @@ python manage.py runserver
 - `api/v1`
 - `media`
 
-TODO: add notes on how to interact with the endpoints. 
+### Admin
+
+Go to your local endpoint:
+
+```
+http://127.0.0.1:8000/admin
+```
+
+and log in.
+
