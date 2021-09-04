@@ -53,14 +53,6 @@ Run the server:
 python manage.py runserver
 ```
 
-### Endpoints
-
-- `admin`
-- `swagger`
-- `redoc`
-- `api/v1`
-- `media`
-
 ### Admin
 
 Go to your local endpoint:
@@ -69,5 +61,21 @@ Go to your local endpoint:
 http://127.0.0.1:8000/admin
 ```
 
-and log in.
+and log in. This is where you can keep an eye on things. 
+
+### API
+
+**TODO need to get docs on how to interact with these endpoints**
+
+These are the API urls:
+
+```python
+default_router.register("user", UserViewSet, basename="user")
+default_router.register("me", CurrentUserViewSet, basename="me")
+default_router.register("user_group", UserGroupViewSet, basename="user_group")
+default_router.register("group_poll", GroupPollViewSet, basename="group_poll")
+default_router.register("location", LocationViewSet, basename="location")
+default_router.register("friend", FriendsViewSet, basename="friend")
+default_router.register('group_chat', GroupChatViewSet, basename='group_chat')
+```
 
