@@ -25,6 +25,12 @@ pip install -r requirements.txt
 
 Add DJANGO_SECRET to environmental variables
 
+#### Apply migrations 
+
+```
+python manage.py migrate
+```
+
 #### Set up the database
 
 TODO
