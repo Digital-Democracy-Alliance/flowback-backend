@@ -1,7 +1,8 @@
-# Flowback Backend
+# Flowback
 
+## A liquid democracy engine
 
-The flowback backend is baded on the python django package.
+The Flowback backend is baded on the python django package.
 
 ### Install
 
