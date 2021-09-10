@@ -18,7 +18,6 @@
 # along with this program.  If not, see https://www.gnu.org/licenses/.
 
 from rest_framework import serializers
-
 from flowback.users.models import User, Group, OnboardUser, GroupRequest, GroupDocs, Country, State, City, Friends, \
     FriendChatMessage, GroupChatMessage
 
@@ -99,6 +98,8 @@ class SimpleUserSerializer(serializers.ModelSerializer):
 
     def get_friendship_status(self, obj):
         user = self.get_user()
+        if user is None or user.is_anonymous:
+            return 'not friend'
         if Friends.objects.filter(user_1=user, user_2=obj.id, request_accept=True) or Friends.objects.filter\
                 (user_2=user, user_1=obj.id, request_accept=True):
             return "friend"

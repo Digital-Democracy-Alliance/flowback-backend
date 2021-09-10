@@ -119,6 +119,8 @@ class GetGroupPollsListSerializer(serializers.ModelSerializer):
 
     def get_voting_status(self, obj):
         user = self.get_user()
+        if user.id is None:
+            return ""
         vote = PollVotes.objects.filter(poll=obj, user=user).first()
         if vote:
             return vote.vote_type

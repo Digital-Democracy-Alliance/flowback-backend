@@ -50,7 +50,8 @@ from flowback.users.serializer import UserSerializer, SimpleUserSerializer, User
     SearchGroupSerializer, GetAllCountrySerializer, GetAllStatesByCountries, GetAllCityByStateSerializer
 from flowback.users.serializer import CreateFriendRequestSerializer, GetAllFriendRequestSerializer, GetAllFriendsRoomSerializer
 from flowback.polls.serializer import SearchPollSerializer
-from settings.base import FROM_EMAIL
+from settings.base import EMAIL_HOST_USER, DEBUG
+
 
 
 class UserViewSet(viewsets.ViewSet):
@@ -75,8 +76,10 @@ class UserViewSet(viewsets.ViewSet):
                     user_onboard.save()
                     # send email with verification code
                     send_mail('Flowback Verification Code', 'Please Enter This Code: %s' % (verification_code),
-                              FROM_EMAIL,
+                              EMAIL_HOST_USER,
                               [str(serializer.data.get('email'))])
+                    if DEBUG:
+                        print(verification_code)
                     result = success_response(data=None, message="")
                     return Created(result)
                 else:
@@ -88,8 +91,10 @@ class UserViewSet(viewsets.ViewSet):
                                            screen_name=serializer.validated_data.get('screen_name'),
                                            verification_code=verification_code)
                 send_mail('Flowback Verification Code', 'Please Enter This Code: %s' % (verification_code),
-                          FROM_EMAIL,
+                          EMAIL_HOST_USER,
                           [str(serializer.data.get('email'))])
+                if DEBUG:
+                    print(verification_code)
                 result = success_response(data=None, message="")
                 return Created(result)
 

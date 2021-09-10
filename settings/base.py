@@ -153,22 +153,14 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator", },
 ]
 
-EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
-SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
-FROM_EMAIL = env('FROM_EMAIL', default='flowback.dev@gmail.com')
-EMAIL_HOST = env('EMAIL_HOST', default='smtp.sendgrid.net')
-
-# Toggle sandbox mode (when running in DEBUG mode)
-SENDGRID_SANDBOX_MODE_IN_DEBUG = False
-
-# echo to stdout or any other file-like object that is passed to the backend via the stream kwarg.
-SENDGRID_ECHO_TO_STDOUT = True
-
-EMAIL_HOST_USER = SENDGRID_API_KEY  # this is exactly the value 'apikey'
-EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-FROM_EMAIL = FROM_EMAIL
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" if not DEBUG else \
+                "django.core.mail.backends.dummy.EmailBackend"
+EMAIL_HOST = env('EMAIL_HOST', default='<smtp.yourserver.com>')
+EMAIL_PORT = env('EMAIL_PORT', default='<your-server-port>')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='<your-email>')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_USER', default='<your-email-password>')
+EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=True)
+EMAIL_USE_SSL = env('EMAIL_USE_SSL', default=False)
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/

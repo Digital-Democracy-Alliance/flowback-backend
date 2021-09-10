@@ -52,7 +52,6 @@ from flowback.polls.serializer import GroupPollCreateSerializer, GetGroupPollsLi
     CreatePollCommentSerializer, GetPollCommentsSerializer, GetPendingPollListSerializer, GetBookmarkPollListSerializer, \
     GroupPollUpdateSerializer, CreatePollCounterProposalSerializer, GetPollCounterProposalDetailsSerializer, \
     CreateCounterProposalCommentSerializer, DelegatorSerializer
-from settings.base import FROM_EMAIL
 
 
 class GroupPollViewSet(viewsets.ViewSet):
@@ -279,22 +278,31 @@ class GroupPollViewSet(viewsets.ViewSet):
         result = failed_response(data=None, message="Group does not exist.")
         return BadRequest(result)
 
-    @decorators.action(detail=False, methods=['post'], url_path="home_all_poll_list")
+    @decorators.action(detail=False, methods=['post'], url_path="home_all_poll_list", permission_classes=[AllowAny])
     def get_all_poll_list(self, request, *args, **kwargs):
         user = request.user
         data = request.data
         response = dict()
         first_page = data.get('first_page')
         last_poll_created_at = data.get('last_poll_created_at', None)
-        if first_page:
-            # get all poll of public group or user is participate of that group
-            polls = Poll.objects.filter(Q(group__public=True) | Q(Q(group__owners__in=[user]) | Q(group__admins__in=[user])
-                                        | Q(group__moderators__in=[user]) | Q(group__members__in=[user]) |
-                                          Q(group__delegators__in=[user]), group__public=False)).order_by('-created_at')
-            last_poll_created_at = polls.first().created_at if polls else None
-            response['last_poll_created_at'] = last_poll_created_at
+        if user.id is None:
+            if first_page:
+                # get all poll of public group or user is participate of that group
+                polls = Poll.objects.filter(group__public=True).order_by('-created_at')
+                last_poll_created_at = polls.first().created_at if polls else None
+                response['last_poll_created_at'] = last_poll_created_at
+            else:
+                polls = Poll.objects.filter(created_at__lte=last_poll_created_at).order_by('-created_at') if last_poll_created_at else []
         else:
-            polls = Poll.objects.filter(created_at__lte=last_poll_created_at).order_by('-created_at') if last_poll_created_at else []
+            if first_page:
+                # get all poll of public group or user is participate of that group
+                polls = Poll.objects.filter(Q(group__public=True) | Q(Q(group__owners__in=[user]) | Q(group__admins__in=[user])
+                                            | Q(group__moderators__in=[user]) | Q(group__members__in=[user]) |
+                                              Q(group__delegators__in=[user]), group__public=False)).order_by('-created_at')
+                last_poll_created_at = polls.first().created_at if polls else None
+                response['last_poll_created_at'] = last_poll_created_at
+            else:
+                polls = Poll.objects.filter(created_at__lte=last_poll_created_at).order_by('-created_at') if last_poll_created_at else []
 
         page_number = data.get('page', 1)  # page number
         page_size = data.get('page_size', 10)  # size of data per page
@@ -651,7 +659,7 @@ class GroupPollViewSet(viewsets.ViewSet):
         #     raise Exception("Poll has not been finished yet.")
 
     @decorators.action(detail=False, methods=['post'], url_path="get_all_counter_proposal")
-    def get_all_counter_proposal(self, request, *args, **kwargs):  # TODO Adjust this to work with delegate system
+    def get_all_counter_proposal(self, request, *args, **kwargs):
         data = request.data
         user = request.user
         poll = Poll.objects.filter(id=data.get('poll')).first() if data.get('poll') else None
