@@ -796,7 +796,7 @@ class UserGroupViewSet(viewsets.ViewSet):
                     polls = Poll.objects.filter(
                         Q(group__public=True) | Q(Q(group__owners__in=[user]) | Q(group__admins__in=[user])
                                                   | Q(group__moderators__in=[user]) | Q(group__members__in=[user]) |
-                                                  Q(group__delegators__in=[user]), group__public=False))
+                                                  Q(group__delegators__in=[user]), group__public=False)).distinct()
                     # filter polls by search query passed in search box
                     polls = polls.filter(title__icontains=search_value).order_by('-created_at')
                     last_created_at = polls.first().created_at if polls else None
@@ -806,7 +806,8 @@ class UserGroupViewSet(viewsets.ViewSet):
                     polls = Poll.objects.filter(
                         Q(group__public=True) | Q(Q(group__owners__in=[user]) | Q(group__admins__in=[user])
                                                   | Q(group__moderators__in=[user]) | Q(group__members__in=[user]) |
-                                                  Q(group__delegators__in=[user]), group__public=False)).filter(created_at__lte=last_created_at) if last_created_at else []
+                                                  Q(group__delegators__in=[user]), group__public=False)
+                    ).distinct().filter(created_at__lte=last_created_at) if last_created_at else []
                     # filter polls by search query passed in search box
                     polls = polls.filter(title__icontains=search_value).order_by('-created_at') if last_created_at else []
                 message = "Get all poll list successfully with search value."
@@ -815,14 +816,16 @@ class UserGroupViewSet(viewsets.ViewSet):
                     polls = Poll.objects.filter(
                         Q(group__public=True) | Q(Q(group__owners__in=[user]) | Q(group__admins__in=[user])
                                                   | Q(group__moderators__in=[user]) | Q(group__members__in=[user]) |
-                                                  Q(group__delegators__in=[user]), group__public=False)).order_by('-created_at')
+                                                  Q(group__delegators__in=[user]), group__public=False)
+                    ).distinct().order_by('-created_at')
                     last_created_at = polls.first().created_at if polls else None
                     response['last_created_at'] = last_created_at
                 else:
                     polls = Poll.objects.filter(
                         Q(group__public=True) | Q(Q(group__owners__in=[user]) | Q(group__admins__in=[user])
                                                   | Q(group__moderators__in=[user]) | Q(group__members__in=[user]) |
-                                                  Q(group__delegators__in=[user]), group__public=False)).filter(
+                                                  Q(group__delegators__in=[user]), group__public=False)
+                    ).distinct().filter(
                         created_at__lte=last_created_at).order_by('-created_at') if last_created_at else []
                 message = "Get all poll list successfully."
 

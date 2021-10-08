@@ -640,6 +640,9 @@ class GroupPollViewSet(viewsets.ViewSet):
                     if user in group.delegators.all():
                         multiplier = len(PollUserDelegate.objects.filter(delegator=user, group=group).all())
 
+                    # TODO priority is a constant, deleting a counter proposal doesn't change it's score,
+                    # A solution would probably be to sort the proposals in priority order,
+                    # and then to add a counter
                     for sub, c_index in enumerate(user_c_indexes):
                         if c_index.is_positive:
                             counter_proposals[index].final_score += (len(counter_proposals) - c_index.priority) \
