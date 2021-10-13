@@ -37,7 +37,7 @@ from flowback.users.models import Group, User
 class Post(TimeStampedUUIDModel):
     group = models.ForeignKey(Group,on_delete=models.CASCADE)
     description = models.TextField(_('Description'), blank=True)
-    image= models.ImageField(null=True, blank=True)
+    image = models.ImageField(null=True, blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
                                on_delete=models.CASCADE,
                                related_name='posts')
@@ -81,6 +81,19 @@ class Poll(TimeStampedUUIDModel):
     title = models.CharField(_('Title'), max_length=256)
     description = models.TextField(_('Group Description'), null=True, blank=True)
     tag = TaggableManager()
+
+    class Type(models.TextChoices):
+        POLL = 'PO', _('poll')
+        MISSION = 'MS', _('mission')
+        EVENT = 'EV',  _('event')
+
+    type = models.CharField(
+        max_length=2,
+        choices=Type.choices,
+        default=Type.POLL
+    )
+
+    success = models.BooleanField(default=False)
     files = models.ManyToManyField(PollDocs, related_name='poll_documents')
     accepted = models.BooleanField(default=True)
     accepted_at = models.DateTimeField(_('Request accepted time'), null=True, blank=True)
@@ -130,7 +143,18 @@ class PollBookmark(TimeStampedUUIDModel):
 
 class PollCounterProposal(TimeStampedUUIDModel):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+
+    class Type(models.TextChoices):
+        DEFAULT = 'DEFAULT', _('Default')
+        DROP = 'DROP', _('Drop')
+
+    type = models.CharField(
+        max_length=30,
+        choices=Type.choices,
+        default=Type.DEFAULT
+    )
+
     proposal = models.TextField()
     final_score = models.IntegerField(null=True, blank=True)
     file = models.FileField(upload_to='groups/polls/proposal/', blank=True, null=True)
